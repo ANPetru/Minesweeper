@@ -19,13 +19,27 @@ public class MainGame extends javax.swing.JFrame {
 
     private Mine[][] mines;
     private int numBombs;
+    public boolean gameOver;
+    private Config config;
+    private LevelSelection ls;
 
     /**
      * Creates new form MainGame
      */
     public MainGame() {
         initComponents();
-        initMines(10);
+        config = Config.getInstance();
+        ls = new LevelSelection(this);
+        add(ls);
+        ls.setVisible(true);
+        pack();
+
+    }
+
+    public void startGame() {
+        remove(ls);
+        initMines(config.numMines);
+        gameOver = false;
     }
 
     private void initMines(int n) {
@@ -34,39 +48,52 @@ public class MainGame extends javax.swing.JFrame {
             for (int col = 0; col < mines.length; col++) {
 
                 mines[row][col] = new Mine(row, col, this);
-                mines[row][col].setPreferredSize(new Dimension(40, 40));
-                mines[row][col].addActionListener(mines[row][col]);
+                mines[row][col].setPreferredSize(new Dimension(config.mineSize, config.mineSize));
+                mines[row][col].addMouseListener(mines[row][col]);
+
                 this.getContentPane().add(mines[row][col]);
             }
 
         }
 
-        setMinimumSize(new Dimension(500, 500));
+        setMinimumSize(new Dimension(getBoardDimension(), getBoardDimension()));
 
         setVisible(true);
         putBombs(n);
     }
 
+    private int getBoardDimension() {
+        return config.mineSize * config.numRowCol + 100;
+    }
+
     public void openSurrondingMines(int row, int col) {
 
         if (row - 1 >= 0) {
-            mines[row - 1][col].clicked();
-            mines[row - 1][col - 1].clicked();
-            mines[row - 1][col + 1].clicked();
+            if (mines[row - 1][col].isEnabled()) {
+                mines[row - 1][col].clicked();
+            }
+            if (col - 1 >= 0 && mines[row - 1][col - 1].isEnabled()) {
+                mines[row - 1][col - 1].clicked();
+            }
+            if (col + 1 < mines.length && mines[row - 1][col + 1].isEnabled()) {
+                mines[row - 1][col + 1].clicked();
+            }
         }
 
-        if (col - 1 >= 0) {
+        if (col - 1 >= 0 && mines[row][col - 1].isEnabled()) {
             mines[row][col - 1].clicked();
         }
-        if (col + 1 < mines.length) {
+        if (col + 1 < mines.length && mines[row][col + 1].isEnabled()) {
             mines[row][col + 1].clicked();
         }
         if (row + 1 < mines.length) {
-            if (col - 1 >= 0) {
+            if (col - 1 >= 0 && mines[row + 1][col - 1].isEnabled()) {
                 mines[row + 1][col - 1].clicked();
             }
-            mines[row + 1][col].clicked();
-            if (col + 1 < mines.length) {
+            if (mines[row + 1][col].isEnabled()) {
+                mines[row + 1][col].clicked();
+            }
+            if (col + 1 < mines.length && mines[row + 1][col + 1].isEnabled()) {
                 mines[row + 1][col + 1].clicked();
             }
         }
@@ -118,6 +145,23 @@ public class MainGame extends javax.swing.JFrame {
         }
         return surrBombs;
 
+    }
+
+    public void gameOver() {
+        if (!gameOver) {
+            gameOver = true;
+            showBombs();
+        }
+    }
+
+    private void showBombs() {
+        for (int row = 0; row < mines.length; row++) {
+            for (int col = 0; col < mines.length; col++) {
+                if (mines[row][col].isBomb) {
+                    mines[row][col].clicked();
+                }
+            }
+        }
     }
 
     /**
