@@ -22,6 +22,7 @@ public class Config {
 
     private static final String FILE_LEVELS = "levels";
     private static final String FILE_CONFIG = "config";
+    private int level;
 
     int mineSize;
     int numMines;
@@ -33,6 +34,7 @@ public class Config {
         mineSize = 40;
         numMines = 10;
         numRowCol = 10;
+        level = 0;
     }
 
     public static Config getInstance() {
@@ -56,11 +58,20 @@ public class Config {
     }
 
     public void setLevel(int level) {
+        this.level = level;
         BufferedReader in = null;
         try {
             in = new BufferedReader(new FileReader(FILE_LEVELS));
-            String line;
-            while ((line = in.readLine()) != null) {
+            String line = "";
+            int counter = 0;
+            while (counter <= level && (line = in.readLine()) != null) {
+                counter++;
+            }
+            String[] levelConfig = line.split(",");
+            if (levelConfig.length == 3) {
+                mineSize = Integer.parseInt(levelConfig[0]);
+                numMines = Integer.parseInt(levelConfig[1]);
+                numRowCol = Integer.parseInt(levelConfig[2]);
                 System.out.println(line);
             }
         } catch (FileNotFoundException ex) {
@@ -78,5 +89,17 @@ public class Config {
                 }
             }
         }
+    }
+
+    public int getFontSize() {
+        switch (level) {
+            case 0:
+                return 16;
+            case 1:
+                return 10;
+            case 2:
+                return 6;
+        }
+        return 16;
     }
 }

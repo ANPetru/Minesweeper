@@ -33,7 +33,7 @@ public class Mine extends JButton implements MouseListener {
         this.row = row;
         this.col = col;
         this.game = game;
-        setFont(new Font("Arial", Font.PLAIN, 18));
+        setFont(new Font("Arial", Font.BOLD, Config.getInstance().getFontSize()));
 
     }
 
@@ -62,7 +62,7 @@ public class Mine extends JButton implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent me) {
         if (me.getButton() == 1) {
-            if (!game.gameOver) {
+            if (!game.gameOver && getBackground()!=Color.yellow) {
                 clicked();
             }
         } else if (me.getButton() == 3) {
@@ -71,6 +71,8 @@ public class Mine extends JButton implements MouseListener {
             } else {
                 setBackground(Color.white);
             }
+            game.checkWin();
+
         }
     }
 

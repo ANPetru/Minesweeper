@@ -38,12 +38,12 @@ public class MainGame extends javax.swing.JFrame {
 
     public void startGame() {
         remove(ls);
-        initMines(config.numMines);
+        initMines();
         gameOver = false;
     }
 
-    private void initMines(int n) {
-        mines = new Mine[n][n];
+    private void initMines() {
+        mines = new Mine[config.numRowCol][config.numRowCol];
         for (int row = 0; row < mines.length; row++) {
             for (int col = 0; col < mines.length; col++) {
 
@@ -59,11 +59,21 @@ public class MainGame extends javax.swing.JFrame {
         setMinimumSize(new Dimension(getBoardDimension(), getBoardDimension()));
 
         setVisible(true);
-        putBombs(n);
+        putBombs(config.numMines);
     }
 
     private int getBoardDimension() {
+        if (config.numMines == 10) {
+            System.out.println("aaa");
+            return config.mineSize * config.numRowCol + 100;
+        } else if (config.numMines == 40) {
+            System.out.println("bbb");
+            return config.mineSize * config.numRowCol + 140;
+
+        }
+        System.out.println("ccc");
         return config.mineSize * config.numRowCol + 100;
+
     }
 
     public void openSurrondingMines(int row, int col) {
@@ -103,8 +113,8 @@ public class MainGame extends javax.swing.JFrame {
         numBombs = n;
         int generatedBombs = 0;
         while (generatedBombs < n) {
-            int randomRow = (int) (Math.random() * n);
-            int randomCol = (int) (Math.random() * n);
+            int randomRow = (int) (Math.random() * config.numRowCol);
+            int randomCol = (int) (Math.random() * config.numRowCol);
             if ((generatedBombs < numBombs) && !(mines[randomRow][randomCol].isBomb)) {
                 generatedBombs++;
                 mines[randomRow][randomCol].isBomb = true;
@@ -150,17 +160,37 @@ public class MainGame extends javax.swing.JFrame {
     public void gameOver() {
         if (!gameOver) {
             gameOver = true;
-            showBombs();
+            showBombs(false);
         }
     }
 
-    private void showBombs() {
+    private void showBombs(boolean won) {
         for (int row = 0; row < mines.length; row++) {
             for (int col = 0; col < mines.length; col++) {
                 if (mines[row][col].isBomb) {
                     mines[row][col].clicked();
+                    if(won){
+                        System.out.println("aaa");
+                        mines[row][col].setForeground(Color.yellow);
+                    }
                 }
             }
+        }
+    }
+
+    public void checkWin() {
+        boolean win = true;
+        for (int row = 0; row < mines.length; row++) {
+            for (int col = 0; col < mines.length; col++) {
+                if (mines[row][col].isBomb) {
+                    if (mines[row][col].getBackground()!= Color.yellow) {
+                        win = false;
+                    }
+                }
+            }
+        }
+        if(win){
+            showBombs(true);
         }
     }
 
@@ -193,16 +223,24 @@ public class MainGame extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainGame.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainGame.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainGame.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainGame.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
